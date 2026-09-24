@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="textrieve — free, offline image-to-text (OCR). Drag in an image, get the text." />
+    <title>textrieve — image to text</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="logo" href="/">
+        <span class="logo-mark">t</span>
+        <span class="logo-word">textrieve</span>
+      </a>
+      <div class="status" id="health" title="OCR engine status">
+        <span class="dot" id="health-dot"></span>
+        <span id="health-label">checking engine…</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>Turn images into <span class="accent">text</span>.</h1>
+        <p class="sub">
+          Free, private, fully open-source OCR. Runs locally — no account, no API keys, no upload to third parties.
+        </p>
+      </section>
+
+      <section class="panel">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload an image">
+          <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" hidden />
+          <div class="dz-empty" id="dz-empty">
+            <svg class="dz-icon" viewBox="0 0 24 24" width="44" height="44" aria-hidden="true">
+              <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                d="M3 16l5-5 4 4 3-3 6 6M3 16V6a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1zM9.5 8.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" />
+            </svg>
+            <p class="dz-title">Drop an image here</p>
+            <p class="dz-hint">or click to browse · PNG, JPG, WEBP, BMP, TIFF · up to 12&nbsp;MB</p>
+          </div>
+          <div class="dz-preview" id="dz-preview" hidden>
+            <img id="preview-img" alt="Uploaded image preview" />
+            <div class="dz-meta">
+              <span id="preview-name"></span>
+              <button type="button" class="quiet" id="clear-btn">clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="primary" id="run-btn" disabled>Extract text</button>
+        </div>
+      </section>
+
+      <section class="panel result-panel" id="result-panel" hidden>
+        <div class="result-head">
+          <h2>Extracted text</h2>
+          <span class="meta" id="result-meta"></span>
+        </div>
+        <textarea id="result-text" class="result-text" readonly spellcheck="false"
+          placeholder="Extracted text appears here."></textarea>
+        <div class="actions">
+          <button type="button" class="ghost" id="copy-btn" disabled>Copy</button>
+          <button type="button" class="ghost" id="download-btn" disabled>Download .txt</button>
+        </div>
+      </section>
+
+      <p class="error" id="error" hidden></p>
+    </main>
+
+    <footer>
+      <span>textrieve v1.0</span>
+      <span>·</span>
+      <span>RapidOCR (ONNX) on CPU</span>
+      <span>·</span>
+      <span>open source</span>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

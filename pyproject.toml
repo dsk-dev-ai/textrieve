@@ -1,0 +1,29 @@
+[project]
+name = "textrieve"
+version = "1.0.0"
+description = "Free, fully-open image-to-text (OCR). CLI, REST API, and a clean web UI."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-multipart>=0.0.9",
+    "pillow>=10.0",
+    "rapidocr-onnxruntime>=1.3",
+    "numpy>=1.24",
+]
+
+[project.scripts]
+textrieve = "cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["."]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
