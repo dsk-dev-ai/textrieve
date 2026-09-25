@@ -8,6 +8,7 @@ Drop in an image or a PDF — get clean text. **Offline OCR** on your own CPU, w
 and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored server-side.
 
 [![Try it live](https://img.shields.io/badge/Try_it_live-textrieve.onrender.com-34d399?style=for-the-badge&logo=render&logoColor=white)](https://textrieve.onrender.com)
+[![PyPI](https://img.shields.io/pypi/v/textrieve?style=for-the-badge&logo=pypi&logoColor=white&color=3775a9)](https://pypi.org/project/textrieve/)
 [![GitHub stars](https://img.shields.io/github/stars/dsk-dev-ai/textrieve?style=for-the-badge&logo=github&color=6c8cff)](https://github.com/dsk-dev-ai/textrieve)
 [![Release](https://img.shields.io/github/v/release/dsk-dev-ai/textrieve?style=for-the-badge&color=0ea5e9)](https://github.com/dsk-dev-ai/textrieve/releases)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3178c6?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
