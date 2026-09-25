@@ -12,7 +12,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV PORT=8080
+ENV OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    OMP_WAIT_POLICY=PASSIVE \
+    TEXTRIEVE_PERMITS=1 \
+    PORT=8080
 EXPOSE 8080
 
 HEALTHCHECK --interval=60s --timeout=10s --start-period=90s --retries=3 \

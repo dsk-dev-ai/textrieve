@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import time
 from pathlib import Path
 
@@ -17,8 +18,8 @@ ALLOWED = {"png", "jpg", "jpeg", "webp", "bmp", "tiff", "tif"}
 
 # Free-tier safety: bound how many ONNX inferences run at once and how many
 # requests are allowed to queue. Beyond the queue we return 503 instead of
-# letting memory grow until the process dies.
-OCR_PERMITS = 2
+# letting memory grow until the process dies. Tune via TEXTRIEVE_PERMITS.
+OCR_PERMITS = int(os.environ.get("TEXTRIEVE_PERMITS", "2"))
 MAX_QUEUE = 60
 _sem = anyio.Semaphore(OCR_PERMITS)
 _inflight = 0

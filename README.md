@@ -16,7 +16,7 @@ and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored
 </div>
 
 > **Status:** v1.1.0 — auto-expiring results (2 min), free-tier memory guards, UI polish.
-> **Try it live:** [textrieve.vercel.app](https://textrieve.vercel.app) (UI) · Render API instance coming up.
+> **Try it live:** [textrieve.vercel.app](https://textrieve.vercel.app) (UI) · [textrieve.onrender.com](https://textrieve.onrender.com) (REST API).
 
 ---
 
