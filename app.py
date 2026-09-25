@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 import ocr
 
 APP_NAME = "textrieve"
-VERSION = "1.2.0"
+VERSION = "1.2.1"
 MAX_BYTES = 12 * 1024 * 1024
 ALLOWED = {"png", "jpg", "jpeg", "webp", "bmp", "tiff", "tif", "pdf"}
 

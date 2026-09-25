@@ -1,6 +1,6 @@
 [project]
 name = "textrieve"
-version = "1.2.0"
+version = "1.2.1"
 description = "Free, fully-open image & PDF-to-text (OCR). CLI, REST API, and a clean web UI."
 readme = "README.md"
 requires-python = ">=3.10"
