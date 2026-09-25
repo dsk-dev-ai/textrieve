@@ -22,6 +22,40 @@ const EXPIRY_MS = 2 * 60 * 1000;
 let currentFile = null;
 let expiryTimeout = null;
 let expiryInterval = null;
+let apiBase = "";
+
+// The browser UI can live anywhere (localhost, Render, or a static Vercel
+// deploy). Prefer the same origin; fall back to the public Render instance so
+// the static front-end always finds a working OCR API.
+const FALLBACK_API = "https://textrieve.onrender.com";
+
+async function resolveApiBase() {
+  if (apiBase) return apiBase;
+  for (const base of ["", FALLBACK_API]) {
+    try {
+      const res = await fetch((base || "/") + "api/health", {
+        signal: AbortSignal.timeout(6000),
+      });
+      if (res.ok) {
+        apiBase = base;
+        return base;
+      }
+    } catch {
+      /* try next candidate */
+    }
+  }
+  return "";
+}
+
+async function call(path, options) {
+  const base = await resolveApiBase();
+  const res = await fetch(base + path, options);
+  return res;
+}
+
+function apiUrl(path) {
+  return (apiBase || "") + path;
+}
 
 function setHealth(state, label) {
   healthDot.className = "dot " + state;
@@ -30,9 +64,10 @@ function setHealth(state, label) {
 
 async function checkHealth() {
   try {
-    const res = await fetch("/api/health");
+    const res = await call("api/health");
+    if (!res.ok) throw new Error("health " + res.status);
     const data = await res.json();
-    setHealth("ok", data.engine + " · ready");
+    setHealth("ok", (apiBase ? "remote · " : "") + data.engine + " · ready");
   } catch {
     setHealth("bad", "engine unavailable");
   }
@@ -142,7 +177,7 @@ runBtn.addEventListener("click", async () => {
   try {
     const fd = new FormData();
     fd.append("file", currentFile);
-    const res = await fetch("/api/ocr", { method: "POST", body: fd });
+    const res = await call("api/ocr", { method: "POST", body: fd });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Server error (" + res.status + ").");
 

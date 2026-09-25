@@ -134,8 +134,15 @@ longer and restarts it cleanly after the idle timeout.
 
 ### Vercel (static front-end only)
 
-The web folder is plain HTML/CSS/JS — point a Vercel static project at `web/` for the UI, and
-point `app.js` at a hosted instance for the OCR API.
+The web folder is plain HTML/CSS/JS — point a Vercel static project at `web/`. The UI
+auto-detects its OCR API: same origin first, then it falls back to the hosted Render API,
+so the static deploy works with zero config (health check in the header shows when it is
+running on the remote engine).
+
+**One-click deploys** (free tiers):
+
+[![Deploy to Render](https://render.com/images/deploy/render.svg)](https://render.com/deploy?repo=https://github.com/dsk-dev-ai/textrieve)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/dsk-dev-ai/textrieve)
 
 > **Honest note:** on Render's free tier a single CPU does roughly a few OCR passes per second
 > max. The built-in concurrency guards (2 parallel inferences, bounded queue) keep it alive
