@@ -18,7 +18,7 @@ and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored
 
 </div>
 
-> **Status:** v1.2.0 — multi-page **PDF → text**, language hints, auto-expiring results (2 min), live progress bar.
+> **Status:** v1.2.1 — multi-page **PDF → text**, language hints, auto-expiring results (2 min), live progress bar. Live on PyPI.
 > **Hosted:** [textrieve.onrender.com](https://textrieve.onrender.com) — UI + REST API on one free instance.
 
 ---
@@ -51,7 +51,7 @@ and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored
 
 ## Quickstart
 
-**From PyPI (once published):**
+**From PyPI:**
 
 ```bash
 pip install textrieve
