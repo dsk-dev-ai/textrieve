@@ -16,7 +16,7 @@ and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored
 </div>
 
 > **Status:** v1.1.0 — auto-expiring results (2 min), free-tier memory guards, UI polish.
-> **Try it live:** [textrieve.vercel.app](https://textrieve.vercel.app) (UI) · [textrieve.onrender.com](https://textrieve.onrender.com) (REST API).
+> **Try it live:** [textrieve.onrender.com](https://textrieve.onrender.com) — UI + REST API.
 
 ---
 
@@ -119,9 +119,10 @@ python cli.py ./documents/            # OCR every image in a folder
 
 ## Free-tier deployment
 
-Perfect for Render (free tier, 512 MB) and Vercel.
+One free Render instance hosts **both** the web UI and the REST API — a static front-end
+isn't needed.
 
-### Render (API + full app)
+### Render (UI + API in one service)
 
 ```
 # 1. Use the included render.yaml
@@ -131,24 +132,18 @@ Or manually: build `pip install -r requirements.txt`, start
 `uvicorn app:app --host 0.0.0.0 --port $PORT --workers 1`, health check at `/api/health`.
 
 `render.yaml` and a `Dockerfile` are included; the health check keeps the free instance awake
-longer and restarts it cleanly after the idle timeout.
+longer and restarts it cleanly after the idle timeout. The UI is plain HTML/CSS/JS served by
+FastAPI — the front-end talks to the OCR API on the same origin.
 
-### Vercel (static front-end only)
-
-The web folder is plain HTML/CSS/JS — point a Vercel static project at `web/`. The UI
-auto-detects its OCR API: same origin first, then it falls back to the hosted Render API,
-so the static deploy works with zero config (health check in the header shows when it is
-running on the remote engine).
-
-**One-click deploys** (free tiers):
+**One-click deploy** (free tier):
 
 [![Deploy to Render](https://render.com/images/deploy/render.svg)](https://render.com/deploy?repo=https://github.com/dsk-dev-ai/textrieve)
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/dsk-dev-ai/textrieve)
 
 > **Honest note:** on Render's free tier a single CPU does roughly a few OCR passes per second
 > max. The built-in concurrency guards (2 parallel inferences, bounded queue) keep it alive
 > under bursts rather than letting memory pile up — a 1000-request/second crowd needs a paid
-> instance, but a 1000+ **users** day flows through one free box fine.
+> instance, but a 1000+ **users** day flows through one free box fine. Free instances also spin
+> down after ~15 minutes idle; the UI auto-retries the first cold request.
 
 ---
 

@@ -24,9 +24,8 @@ let expiryTimeout = null;
 let expiryInterval = null;
 let apiBase = "";
 
-// The browser UI can live anywhere (localhost, Render, or a static Vercel
-// deploy). Prefer the same origin; fall back to the public Render instance so
-// the static front-end always finds a working OCR API.
+// The UI is served from the same Render instance as the OCR API. Prefer the
+// same origin; the public fallback keeps a standalone copy of web/ working too.
 const FALLBACK_API = "https://textrieve.onrender.com";
 
 async function resolveApiBase() {
