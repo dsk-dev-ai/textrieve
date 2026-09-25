@@ -50,6 +50,16 @@ and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored
 
 ## Quickstart
 
+**From PyPI (once published):**
+
+```bash
+pip install textrieve
+textrieve scan.png          # image
+textrieve big.pdf --lang en # PDF
+```
+
+**From source:**
+
 ```bash
 git clone https://github.com/dsk-dev-ai/textrieve
 cd textrieve
@@ -102,6 +112,10 @@ The optional `lang` query hints the OCR engine (e.g. `en`, `ch`, `japan`, `korea
 
 **Limits (free-tier friendly):** PNG / JPG / WEBP / BMP / TIFF / PDF · up to 12 MB · up to 25 PDF
 pages · oversize or bad-type uploads rejected with clear HTTP errors (415 / 413 / 503 under load).
+
+> **PDFs on the free hosted tier are slow:** pages are OCR'd one-by-one at roughly 30–60 s per
+> page on Render's free CPU. A 1–2 page scan fits fine; bigger documents should be split or OCR'd
+> locally (`pip install textrieve; textrieve big.pdf`).
 
 ---
 
