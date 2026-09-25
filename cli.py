@@ -15,12 +15,22 @@ from pathlib import Path
 
 import ocr
 
-IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff", ".tif"}
+IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tiff", ".tif", ".pdf"}
 
 
-def extract(path: Path) -> dict:
+def extract(path: Path, lang: str | None = None) -> dict:
     data = path.read_bytes()
-    text, confidence, duration_ms = ocr.ocr_image(data)
+    if path.suffix.lower() == ".pdf":
+        text, confidence, duration_ms, pages = ocr.ocr_pdf(data, lang=lang)
+        return {
+            "file": str(path),
+            "text": text,
+            "confidence": confidence,
+            "duration_ms": duration_ms,
+            "pages": pages,
+            "engine": ocr.ENGINE,
+        }
+    text, confidence, duration_ms = ocr.ocr_image(data, lang=lang)
     return {
         "file": str(path),
         "text": text,
@@ -33,10 +43,11 @@ def extract(path: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="textrieve",
-        description="Image-to-text (OCR) on the command line.",
-        epilog="Reads text from any image. Powered by free, offline OCR (no API keys).",
+        description="Image/PDF-to-text (OCR) on the command line.",
+        epilog="Reads text from images or PDFs. Powered by free, offline OCR (no API keys).",
     )
-    parser.add_argument("images", nargs="+", metavar="IMAGE", help="image file(s) to read")
+    parser.add_argument("images", nargs="+", metavar="FILE", help="image or PDF file(s) to read")
+    parser.add_argument("--lang", default=None, help="optional language hint (e.g. en, ch, japan, korea)")
     parser.add_argument("--json", action="store_true", help="emit JSON instead of plain text")
     args = parser.parse_args()
 
@@ -52,10 +63,10 @@ def main() -> int:
             return 1
 
     if not srcs:
-        print("textrieve: no image files found", file=sys.stderr)
+        print("textrieve: no image or PDF files found", file=sys.stderr)
         return 1
 
-    results = [extract(p) for p in srcs]
+    results = [extract(p, lang=args.lang) for p in srcs]
     if args.json:
         print(json.dumps(results, ensure_ascii=False, indent=2))
         return 0

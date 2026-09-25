@@ -1,20 +1,21 @@
 from __future__ import annotations
 
 import os
+import sys
 import time
 from pathlib import Path
 
 import anyio
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 import ocr
 
 APP_NAME = "textrieve"
-VERSION = "1.1.0"
+VERSION = "1.2.0"
 MAX_BYTES = 12 * 1024 * 1024
-ALLOWED = {"png", "jpg", "jpeg", "webp", "bmp", "tiff", "tif"}
+ALLOWED = {"png", "jpg", "jpeg", "webp", "bmp", "tiff", "tif", "pdf"}
 
 # Free-tier safety: bound how many ONNX inferences run at once and how many
 # requests are allowed to queue. Beyond the queue we return 503 instead of
@@ -43,7 +44,13 @@ def health() -> dict:
 
 
 @app.post("/api/ocr")
-async def ocr_endpoint(file: UploadFile = File(...)) -> JSONResponse:
+async def ocr_endpoint(
+    file: UploadFile = File(...),
+    lang: str | None = Query(
+        default=None,
+        description="Optional language hint for the OCR engine (e.g. 'en', 'ch', 'japan', 'korea').",
+    ),
+) -> JSONResponse:
     global _inflight
 
     name = (file.filename or "").lower()
@@ -67,7 +74,11 @@ async def ocr_endpoint(file: UploadFile = File(...)) -> JSONResponse:
             # OCR is blocking (numpy/ONNX): run it in the thread pool so the
             # event loop stays responsive.
             try:
-                text, confidence, duration = await anyio.to_thread.run_sync(ocr.ocr_image, data)
+                if ext == "pdf":
+                    text, confidence, duration, pages = await anyio.to_thread.run_sync(ocr.ocr_pdf, data, lang)
+                else:
+                    pages = 0
+                    text, confidence, duration = await anyio.to_thread.run_sync(ocr.ocr_image, data, lang)
             except ValueError as exc:
                 raise HTTPException(status_code=400, detail=str(exc)) from exc
     finally:
@@ -76,26 +87,38 @@ async def ocr_endpoint(file: UploadFile = File(...)) -> JSONResponse:
     if confidence is None:
         confidence = 0.0
     total_ms = round((time.perf_counter() - t0) * 1000, 1)
+    body: dict = {
+        "text": text,
+        "confidence": confidence,
+        "engine": ocr.ENGINE,
+        "duration_ms": total_ms,
+    }
+    if pages:
+        body["pages"] = pages
     if not text.strip():
-        return JSONResponse(
-            {
-                "text": "",
-                "confidence": 0.0,
-                "engine": ocr.ENGINE,
-                "duration_ms": total_ms,
-                "note": "No text detected in this image.",
-            }
-        )
-    return JSONResponse(
-        {
-            "text": text,
-            "confidence": confidence,
-            "engine": ocr.ENGINE,
-            "duration_ms": total_ms,
-        }
-    )
+        body["text"] = ""
+        body["confidence"] = 0.0
+        body["note"] = "No text detected." if ext != "pdf" else "No text detected in any page."
+    return JSONResponse(body)
 
 
 # API routes are registered first; the static mount below is the catch-all.
-WEB_DIR = Path(__file__).resolve().parent / "web"
-app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+# The web assets live next to this file (repo/Docker), but pip-installed copies
+# ship them under the data dir, so search a few well-known locations.
+def _web_dir() -> Path:
+    here = Path(__file__).resolve().parent
+    candidates = [
+        Path(os.environ.get("TEXTRIEVE_WEB_DIR", "")),  # explicit override
+        here / "web",  # repo / Docker layout
+        Path(sys.prefix) / "textrieve_web",  # pip install (venv/system) layout
+        Path(sys.prefix) / "data" / "textrieve_web",  # alternate pip layout
+        Path.home() / ".local" / "textrieve_web",
+        Path.home() / ".local" / "share" / "textrieve_web",
+    ]
+    for path in candidates:
+        if path and (path / "index.html").is_file():
+            return path
+    return here / "web"
+
+
+app.mount("/", StaticFiles(directory=_web_dir(), html=True), name="web")

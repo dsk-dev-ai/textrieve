@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="textrieve — free, offline image-to-text (OCR). Drag in an image, get the text." />
+    <meta name="description" content="textrieve — free, offline image & PDF-to-text (OCR). Drag in a file, get the text." />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="textrieve — image to text, free & offline" />
-    <meta property="og:description" content="Drag in an image, get clean text. No accounts, no API keys, nothing stored server-side." />
+    <meta property="og:title" content="textrieve — image & PDF to text, free & offline" />
+    <meta property="og:description" content="Drag in an image or PDF, get clean text. No accounts, no API keys, nothing stored server-side." />
     <meta property="og:url" content="https://textrieve.onrender.com" />
     <meta name="theme-color" content="#0b1020" />
-    <title>textrieve — image to text</title>
+    <title>textrieve — image & PDF to text</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" sizes="any" href="/favicon.ico" />
     <link rel="stylesheet" href="styles.css" />
@@ -32,20 +32,20 @@
       <section class="hero">
         <h1>Turn images into <span class="accent">text</span>.</h1>
         <p class="sub">
-          Free, private, fully open-source OCR. Runs locally — no account, no API keys, no upload to third parties.
+          Free, private, fully open-source OCR. No account, no API keys, no upload to third parties — works on images and PDFs.
         </p>
       </section>
 
       <section class="panel">
-        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload an image">
-          <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" hidden />
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload an image or PDF">
+          <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff,application/pdf,.pdf" hidden />
           <div class="dz-empty" id="dz-empty">
             <svg class="dz-icon" viewBox="0 0 24 24" width="44" height="44" aria-hidden="true">
               <path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
                 d="M3 16l5-5 4 4 3-3 6 6M3 16V6a1 1 0 011-1h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1zM9.5 8.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" />
             </svg>
-            <p class="dz-title">Drop an image here</p>
-            <p class="dz-hint">or click to browse · PNG, JPG, WEBP, BMP, TIFF · up to 12&nbsp;MB</p>
+            <p class="dz-title">Drop an image or PDF here</p>
+            <p class="dz-hint">or click to browse · PNG, JPG, WEBP, BMP, TIFF, PDF · up to 12&nbsp;MB</p>
           </div>
           <div class="dz-preview" id="dz-preview" hidden>
             <img id="preview-img" alt="Uploaded image preview" />
@@ -92,9 +92,9 @@
 
     <footer>
       <div class="foot-row">
-        <span>textrieve v1.1</span>
+        <span>textrieve v1.2</span>
         <span>·</span>
-        <span>RapidOCR (ONNX) on CPU</span>
+        <span>RapidOCR (ONNX) on CPU · images & PDFs</span>
         <span>·</span>
         <span>open source</span>
       </div>

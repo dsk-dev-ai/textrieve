@@ -123,15 +123,23 @@ function setFile(file) {
   if (!file) return;
   currentFile = file;
   previewName.textContent = file.name + "  ·  " + (file.size / 1024).toFixed(0) + " KB";
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    previewImg.src = e.target.result;
-    dzEmpty.hidden = true;
-    dzPreview.hidden = false;
-    runBtn.disabled = false;
-    clearError();
-  };
-  reader.readAsDataURL(file);
+  const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name);
+  if (isPdf) {
+    // Browsers can't paint a PDF into an <img>; show a file chip instead.
+    previewImg.hidden = true;
+    previewName.textContent = "PDF  ·  " + file.name + "  ·  " + (file.size / 1024).toFixed(0) + " KB";
+  } else {
+    previewImg.hidden = false;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  dzEmpty.hidden = true;
+  dzPreview.hidden = false;
+  runBtn.disabled = false;
+  clearError();
 }
 
 function clearExpiry() {
@@ -172,7 +180,8 @@ function reset() {
   progressBox.hidden = true;
   progressFill.style.width = "0%";
   dzPreview.hidden = true;
-  dzPreview.querySelector("img").removeAttribute("src");
+  previewImg.hidden = false;
+  previewImg.removeAttribute("src");
   dzEmpty.hidden = false;
   runBtn.disabled = true;
   resultPanel.hidden = true;
@@ -260,9 +269,10 @@ runBtn.addEventListener("click", async () => {
     finishProgress();
     resultText.value = data.text || "";
     resultPanel.hidden = false;
+    const pagePrefix = data.pages && data.pages > 1 ? data.pages + " pages · " : "";
     resultMeta.textContent = data.note
       ? data.note + " · " + data.duration_ms + " ms"
-      : data.confidence.toFixed(1) + "% conf · " + data.duration_ms + " ms";
+      : pagePrefix + data.confidence.toFixed(1) + "% conf · " + data.duration_ms + " ms";
     copyBtn.disabled = resultText.value.trim().length === 0;
     downloadBtn.disabled = resultText.value.trim().length === 0;
     if (data.text && data.text.trim()) startExpiry();

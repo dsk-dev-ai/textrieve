@@ -2,9 +2,9 @@
 
 # textrieve
 
-### Image → text, free & fully open source.
+### Image & PDF → text, free & fully open source.
 
-Drop in an image — get clean text. **Offline OCR** on your own CPU, with a CLI, a REST API,
+Drop in an image or a PDF — get clean text. **Offline OCR** on your own CPU, with a CLI, a REST API,
 and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored server-side.
 
 [![Try it live](https://img.shields.io/badge/Try_it_live-textrieve.onrender.com-34d399?style=for-the-badge&logo=render&logoColor=white)](https://textrieve.onrender.com)
@@ -17,7 +17,7 @@ and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored
 
 </div>
 
-> **Status:** v1.1.0 — auto-expiring results (2 min), live progress bar, free-tier memory guards.
+> **Status:** v1.2.0 — multi-page **PDF → text**, language hints, auto-expiring results (2 min), live progress bar.
 > **Hosted:** [textrieve.onrender.com](https://textrieve.onrender.com) — UI + REST API on one free instance.
 
 ---
@@ -65,11 +65,12 @@ Open http://localhost:8080.
 
 ## Web UI
 
-Drag and drop an image (or click to browse) → preview → **Extract text** → copy or download.
+Drag and drop an image or PDF (or click to browse) → preview → **Extract text** → copy or download.
 
 - Dark, responsive interface — works on desktop and mobile
 - Live **progress bar** (percent + elapsed time) while text is extracted
-- Live **2-minute countdown** on results; text is wiped from the page automatically
+- PDFs are extracted **page-by-page**, each one labelled `[Page N]`
+- Live **2-minute countdown** on results; the page is wiped clean automatically
 - Engine status indicator in the header; GitHub + Sponsor links in the footer
 - No cookies, no tracking pixels, no third-party scripts
 
@@ -84,6 +85,7 @@ Drag and drop an image (or click to browse) → preview → **Extract text** →
 
 ```bash
 curl -F "file=@photo.png" http://localhost:8080/api/ocr
+curl -F "file=@scan.pdf" "http://localhost:8080/api/ocr?lang=en"   # PDF, language hint
 ```
 
 ```json
@@ -95,8 +97,11 @@ curl -F "file=@photo.png" http://localhost:8080/api/ocr
 }
 ```
 
-**Limits (free-tier friendly):** PNG / JPG / WEBP / BMP / TIFF · up to 12 MB · oversize or
-bad-type uploads rejected with clear HTTP errors (415 / 413 / 503 under load).
+For PDFs the response also includes `"pages"` and the text is split with `[Page N]` markers.
+The optional `lang` query hints the OCR engine (e.g. `en`, `ch`, `japan`, `korea`).
+
+**Limits (free-tier friendly):** PNG / JPG / WEBP / BMP / TIFF / PDF · up to 12 MB · up to 25 PDF
+pages · oversize or bad-type uploads rejected with clear HTTP errors (415 / 413 / 503 under load).
 
 ---
 
@@ -104,8 +109,9 @@ bad-type uploads rejected with clear HTTP errors (415 / 413 / 503 under load).
 
 ```bash
 python cli.py scans/receipt.jpg        # print extracted text
+python cli.py scan.pdf --lang en       # OCR a PDF, hint the language
 python cli.py a.png b.png --json      # machine-readable output
-python cli.py ./documents/            # OCR every image in a folder
+python cli.py ./documents/            # OCR every image/PDF in a folder
 ```
 
 ---
@@ -167,18 +173,17 @@ Optional — included by default:
 python -m pytest -q
 ```
 
-The suite **generates its own fixture images** (no external sample downloads) and covers:
-health, UI + favicon serving, real OCR round-trip with confidence, blank images,
-invalid/missing/oversized uploads, and CLI loading. Gated in CI (GitHub Actions, Python 3.11/3.12).
+The suite **generates its own fixture files** (no external sample downloads) and covers:
+health, UI + favicon serving, real image and multi-page PDF OCR round-trips with confidence,
+blank images, invalid/missing/oversized uploads, and CLI loading. Gated in CI (GitHub Actions, Python 3.11/3.12).
 
 ---
 
 ## Roadmap
 
-- [ ] PDF → text (multi-page)
-- [ ] Language hints + CJK/Latin switches
 - [ ] Batch queue in the web UI
 - [ ] PaddleOCR engine switch (even higher accuracy)
+- [ ] Searchable PDF export (text layer baked in)
 
 ---
 
