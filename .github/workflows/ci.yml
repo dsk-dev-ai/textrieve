@@ -19,4 +19,4 @@ jobs:
       - name: Install
         run: pip install -r requirements.txt "pytest>=8" httpx
       - name: Test
-        run: pytest -q
+        run: python -m pytest -q
