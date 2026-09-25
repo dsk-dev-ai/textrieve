@@ -177,9 +177,34 @@ runBtn.addEventListener("click", async () => {
   try {
     const fd = new FormData();
     fd.append("file", currentFile);
-    const res = await call("api/ocr", { method: "POST", body: fd });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Server error (" + res.status + ").");
+
+    let res, data;
+    // Render's free instances spin down when idle (~15 min). The first OCR
+    // after that can be slow or bounce an HTML proxy page while it wakes up,
+    // so retry once before giving up.
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      res = await call("api/ocr", { method: "POST", body: fd });
+      data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+      const wakeup = !res.ok && (!data || res.status >= 500);
+      if (wakeup && attempt === 1) {
+        runBtn.textContent = "Engine waking up — retrying…";
+        await new Promise((r) => setTimeout(r, 12000));
+        continue;
+      }
+      break;
+    }
+
+    if (!res.ok || !data) {
+      const reason = !data
+        ? "The OCR engine is not responding (free instance waking up). Wait ~30 s and try again."
+        : data.detail || "Server error (" + res.status + ").";
+      throw new Error(reason);
+    }
 
     resultText.value = data.text || "";
     resultPanel.hidden = false;
