@@ -100,6 +100,21 @@ button.quiet:hover { color: var(--text); }
 .result-head h2 { font-size: 1.05rem; }
 .meta { color: var(--muted); font-size: 0.82rem; font-family: var(--mono); }
 
+.expires {
+  margin-top: 0.85rem;
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font: 600 0.78rem var(--mono);
+  letter-spacing: 0.03em;
+  color: var(--accent-2);
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.privacy { margin-top: 1rem; color: var(--muted); font-size: 0.82rem; text-align: center; }
+.privacy strong { color: var(--accent-2); font-weight: 600; }
+
 .result-text {
   width: 100%; min-height: 180px; margin-top: 0.9rem;
   padding: 0.9rem 1rem; resize: vertical;

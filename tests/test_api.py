@@ -71,6 +71,23 @@ def test_ocr_missing_file_rejected():
     assert res.status_code == 422
 
 
+def test_ocr_oversized_image_rejected():
+    big = b"\xff" * (12 * 1024 * 1024 + 1024)  # just over the 12 MB cap
+    res = client.post("/api/ocr", files={"file": ("huge.png", big, "image/png")})
+    assert res.status_code == 413
+
+
+def test_ocr_corrupt_image_rejected():
+    res = client.post("/api/ocr", files={"file": ("broken.png", b"not an image at all", "image/png")})
+    assert res.status_code == 400
+
+
+def test_favicon_served():
+    res = client.get("/favicon.svg")
+    assert res.status_code == 200
+    assert "image/svg" in res.headers["content-type"]
+
+
 def test_ocr_bad_extension_rejected():
     png = make_fixture_png()
     res = client.post(

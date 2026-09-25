@@ -14,10 +14,14 @@ const resultMeta = $("#result-meta");
 const copyBtn = $("#copy-btn");
 const downloadBtn = $("#download-btn");
 const errorBox = $("#error");
+const expiresEl = $("#expires");
 const healthDot = $("#health-dot");
 const healthLabel = $("#health-label");
 
+const EXPIRY_MS = 2 * 60 * 1000;
 let currentFile = null;
+let expiryTimeout = null;
+let expiryInterval = null;
 
 function setHealth(state, label) {
   healthDot.className = "dot " + state;
@@ -58,6 +62,36 @@ function setFile(file) {
   reader.readAsDataURL(file);
 }
 
+function clearExpiry() {
+  clearTimeout(expiryTimeout);
+  clearInterval(expiryInterval);
+  expiryTimeout = null;
+  expiryInterval = null;
+  expiresEl.hidden = true;
+  expiresEl.textContent = "";
+}
+
+function startExpiry() {
+  clearExpiry();
+  const deadline = Date.now() + EXPIRY_MS;
+  expiresEl.hidden = false;
+  const tick = () => {
+    const left = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+    const m = Math.floor(left / 60);
+    const s = String(left % 60).padStart(2, "0");
+    expiresEl.textContent = "auto-clears in " + m + ":" + s;
+  };
+  tick();
+  expiryInterval = setInterval(tick, 1000);
+  expiryTimeout = setTimeout(() => {
+    clearExpiry();
+    resultText.value = "";
+    resultPanel.hidden = true;
+    copyBtn.disabled = true;
+    downloadBtn.disabled = true;
+  }, EXPIRY_MS);
+}
+
 function reset() {
   currentFile = null;
   fileInput.value = "";
@@ -66,6 +100,7 @@ function reset() {
   dzEmpty.hidden = false;
   runBtn.disabled = true;
   resultPanel.hidden = true;
+  clearExpiry();
   clearError();
 }
 
@@ -118,6 +153,7 @@ runBtn.addEventListener("click", async () => {
       : data.confidence.toFixed(1) + "% conf · " + data.duration_ms + " ms";
     copyBtn.disabled = resultText.value.trim().length === 0;
     downloadBtn.disabled = resultText.value.trim().length === 0;
+    if (data.text && data.text.trim()) startExpiry();
   } catch (err) {
     showError(err.message);
   } finally {
