@@ -17,6 +17,10 @@ const errorBox = $("#error");
 const expiresEl = $("#expires");
 const healthDot = $("#health-dot");
 const healthLabel = $("#health-label");
+const progressBox = $("#progress");
+const progressFill = $("#progress-fill");
+const progressPct = $("#progress-pct");
+const progressSec = $("#progress-sec");
 
 const EXPIRY_MS = 2 * 60 * 1000;
 let currentFile = null;
@@ -81,6 +85,40 @@ function clearError() {
   errorBox.textContent = "";
 }
 
+// Progress is driven by real elapsed wall-clock time (the "speed" you actually
+// experience), not a fake timer. An adaptive expected-duration curve keeps it
+// climbing at a believable pace no matter how slow the free tier is.
+let progressTimer = null;
+
+function startProgress(note) {
+  clearInterval(progressTimer);
+  const t0 = performance.now();
+  let expected = 9000; // ms we optimistically expect OCR to need
+  progressBox.hidden = false;
+  progressFill.style.width = "0%";
+  progressPct.textContent = "0%";
+  progressSec.textContent = note || "0.0s";
+  progressTimer = setInterval(() => {
+    const elapsed = performance.now() - t0;
+    expected = Math.max(expected, elapsed * 1.5 + 2500); // adapt to real speed
+    const pct = Math.min(95, 100 * (1 - Math.exp(-elapsed / expected)));
+    progressFill.style.width = pct.toFixed(1) + "%";
+    progressPct.textContent = Math.round(pct) + "%";
+    progressSec.textContent = (elapsed / 1000).toFixed(1) + "s";
+  }, 200);
+}
+
+function finishProgress() {
+  clearInterval(progressTimer);
+  progressTimer = null;
+  progressFill.style.width = "100%";
+  progressPct.textContent = "100%";
+  setTimeout(() => {
+    progressBox.hidden = true;
+    progressFill.style.width = "0%";
+  }, 450);
+}
+
 function setFile(file) {
   if (!file) return;
   currentFile = file;
@@ -129,6 +167,10 @@ function startExpiry() {
 function reset() {
   currentFile = null;
   fileInput.value = "";
+  clearInterval(progressTimer);
+  progressTimer = null;
+  progressBox.hidden = true;
+  progressFill.style.width = "0%";
   dzPreview.hidden = true;
   dzPreview.querySelector("img").removeAttribute("src");
   dzEmpty.hidden = false;
@@ -176,13 +218,23 @@ runBtn.addEventListener("click", async () => {
   try {
     const fd = new FormData();
     fd.append("file", currentFile);
+    startProgress();
 
     let res, data;
     // Render's free instances spin down when idle (~15 min). The first OCR
     // after that can be slow or bounce an HTML proxy page while it wakes up,
     // so retry once before giving up.
     for (let attempt = 1; attempt <= 2; attempt++) {
-      res = await call("api/ocr", { method: "POST", body: fd });
+      try {
+        res = await call("api/ocr", { method: "POST", body: fd });
+      } catch (netErr) {
+        if (attempt === 1) {
+          startProgress("engine waking up — retrying…");
+          await new Promise((r) => setTimeout(r, 12000));
+          continue;
+        }
+        throw netErr;
+      }
       data = null;
       try {
         data = await res.json();
@@ -191,7 +243,7 @@ runBtn.addEventListener("click", async () => {
       }
       const wakeup = !res.ok && (!data || res.status >= 500);
       if (wakeup && attempt === 1) {
-        runBtn.textContent = "Engine waking up — retrying…";
+        startProgress("engine waking up — retrying…");
         await new Promise((r) => setTimeout(r, 12000));
         continue;
       }
@@ -205,6 +257,7 @@ runBtn.addEventListener("click", async () => {
       throw new Error(reason);
     }
 
+    finishProgress();
     resultText.value = data.text || "";
     resultPanel.hidden = false;
     resultMeta.textContent = data.note
@@ -214,6 +267,9 @@ runBtn.addEventListener("click", async () => {
     downloadBtn.disabled = resultText.value.trim().length === 0;
     if (data.text && data.text.trim()) startExpiry();
   } catch (err) {
+    clearInterval(progressTimer);
+    progressTimer = null;
+    progressBox.hidden = true;
     showError(err.message);
   } finally {
     runBtn.disabled = !currentFile;

@@ -59,6 +59,16 @@
         <div class="actions">
           <button type="button" class="primary" id="run-btn" disabled>Extract text</button>
         </div>
+
+        <div class="progress" id="progress" hidden>
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-meta">
+            <span id="progress-pct">0%</span>
+            <span id="progress-sec">0.0s</span>
+          </div>
+        </div>
       </section>
 
       <section class="panel result-panel" id="result-panel" hidden>

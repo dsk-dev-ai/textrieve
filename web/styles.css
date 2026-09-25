@@ -125,6 +125,20 @@ button.quiet:hover { color: var(--text); }
 
 .error { color: var(--danger); background: rgba(248, 113, 113, 0.08); border: 1px solid rgba(248, 113, 113, 0.35); padding: 0.8rem 1rem; border-radius: 0.6rem; font-size: 0.9rem; }
 
+.progress { margin-top: 1rem; }
+.progress-track { height: 8px; border-radius: 999px; background: rgba(233, 237, 255, 0.08); border: 1px solid var(--border); overflow: hidden; }
+.progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+.progress-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 0.35rem; font: 600 0.78rem var(--mono); color: var(--muted);
+  font-variant-numeric: tabular-nums; letter-spacing: 0.03em;
+}
+
 footer {
   display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap;
   color: var(--muted); font-size: 0.8rem; padding: 1.4rem 1rem 1.6rem;
