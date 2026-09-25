@@ -7,16 +7,18 @@
 Drop in an image — get clean text. **Offline OCR** on your own CPU, with a CLI, a REST API,
 and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored server-side.
 
-![OCR](https://img.shields.io/badge/OCR-RapidOCR%20(ONNX)-34d399?style=for-the-badge&logo=python&logoColor=white)
-![License](https://img.shields.io/badge/License-Apache--2.0-6c8cff?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.10%2B-3178c6?style=for-the-badge&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
-![No API keys](https://img.shields.io/badge/No%20API%20keys-Yes-38bdf8?style=for-the-badge)
+[![Try it live](https://img.shields.io/badge/Try_it_live-textrieve.onrender.com-34d399?style=for-the-badge&logo=render&logoColor=white)](https://textrieve.onrender.com)
+[![GitHub stars](https://img.shields.io/github/stars/dsk-dev-ai/textrieve?style=for-the-badge&logo=github&color=6c8cff)](https://github.com/dsk-dev-ai/textrieve/stargazers)
+[![Release](https://img.shields.io/github/v/release/dsk-dev-ai/textrieve?style=for-the-badge&color=0ea5e9)](https://github.com/dsk-dev-ai/textrieve/releases)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3178c6?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![CI](https://img.shields.io/github/actions/workflow/status/dsk-dev-ai/textrieve/ci.yml?branch=main&style=for-the-badge&logo=githubactions&label=CI)](https://github.com/dsk-dev-ai/textrieve/actions)
+[![Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-6c8cff?style=for-the-badge)](LICENSE)
 
 </div>
 
-> **Status:** v1.1.0 — auto-expiring results (2 min), free-tier memory guards, UI polish.
-> **Try it live:** [textrieve.onrender.com](https://textrieve.onrender.com) — UI + REST API.
+> **Status:** v1.1.0 — auto-expiring results (2 min), live progress bar, free-tier memory guards.
+> **Hosted:** [textrieve.onrender.com](https://textrieve.onrender.com) — UI + REST API on one free instance.
 
 ---
 
@@ -33,16 +35,16 @@ and a polished browser UI. No accounts, no API keys, no paywalls, nothing stored
 
 ## Contents
 
-- [Quickstart](#-quickstart)
-- [Web UI](#-web-ui)
-- [REST API](#-rest-api)
-- [CLI](#-cli)
-- [Privacy & auto-expiry](#-privacy--auto-expiry)
-- [Free-tier deployment](#-free-tier-deployment)
-- [Memory management](#-memory-management)
-- [Tests](#-tests)
-- [Roadmap](#-roadmap)
-- [Support](#-support)
+- [Quickstart](#quickstart)
+- [Web UI](#web-ui)
+- [REST API](#rest-api)
+- [CLI](#cli)
+- [Privacy & auto-expiry](#privacy--auto-expiry)
+- [Free-tier deployment](#free-tier-deployment)
+- [Memory management](#memory-management)
+- [Tests](#tests)
+- [Roadmap](#roadmap)
+- [Support](#support)
 
 ---
 
@@ -66,8 +68,9 @@ Open http://localhost:8080.
 Drag and drop an image (or click to browse) → preview → **Extract text** → copy or download.
 
 - Dark, responsive interface — works on desktop and mobile
+- Live **progress bar** (percent + elapsed time) while text is extracted
 - Live **2-minute countdown** on results; text is wiped from the page automatically
-- Engine status indicator in the header
+- Engine status indicator in the header; GitHub + Sponsor links in the footer
 - No cookies, no tracking pixels, no third-party scripts
 
 ---
@@ -137,7 +140,7 @@ FastAPI — the front-end talks to the OCR API on the same origin.
 
 **One-click deploy** (free tier):
 
-[![Deploy to Render](https://render.com/images/deploy/render.svg)](https://render.com/deploy?repo=https://github.com/dsk-dev-ai/textrieve)
+[![Deploy to Render](https://img.shields.io/badge/Deploy_to-Render-46e3b7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/deploy?repo=https://github.com/dsk-dev-ai/textrieve)
 
 > **Honest note:** on Render's free tier a single CPU does roughly a few OCR passes per second
 > max. The built-in concurrency guards (2 parallel inferences, bounded queue) keep it alive
@@ -161,7 +164,7 @@ Optional — included by default:
 ## Tests
 
 ```bash
-pytest -q
+python -m pytest -q
 ```
 
 The suite **generates its own fixture images** (no external sample downloads) and covers:
