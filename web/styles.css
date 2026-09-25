@@ -140,9 +140,18 @@ button.quiet:hover { color: var(--text); }
 }
 
 footer {
-  display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap;
+  display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 0.6rem;
   color: var(--muted); font-size: 0.8rem; padding: 1.4rem 1rem 1.6rem;
 }
+.foot-row { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.foot-links { display: flex; gap: 1.2rem; }
+.foot-links a {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  color: var(--muted); text-decoration: none;
+  transition: color 0.15s ease;
+}
+.foot-links a:hover { color: var(--accent-2); }
+.foot-links svg { flex: none; }
 
 @media (max-width: 620px) {
   .hero h1 { font-size: 1.9rem; }
